@@ -2,13 +2,13 @@
 
 Game platformer hài hước chạy ngay trên trình duyệt. Bạn là một ổ bánh mì biết chạy, nhiệm vụ là giải cứu tiệm bánh khỏi băng chuột cống đeo kính râm.
 
-Toàn bộ game nằm trong một file [`game.html`](game.html), viết bằng HTML Canvas và JavaScript thuần. Không cần cài gì, không cần mạng.
+Toàn bộ game nằm trong một file [`index.html`](index.html), viết bằng HTML Canvas và JavaScript thuần. Không cần cài gì, không cần mạng.
 
 ## Cách chơi
 
-**Chơi online:** https://thanhtam1028.github.io/banh-mi-than-toc/game.html
+**Chơi online:** https://gamebanhmi.tcaoadm.com
 
-Hoặc tải `game.html` về rồi nhấp đúp để mở bằng Chrome, Safari hoặc Firefox.
+Hoặc tải `index.html` về rồi nhấp đúp để mở bằng Chrome, Safari hoặc Firefox.
 
 | Phím | Việc |
 |---|---|
@@ -22,7 +22,7 @@ Hoặc tải `game.html` về rồi nhấp đúp để mở bằng Chrome, Safar
 
 ## Tự sửa game
 
-Mở `game.html` bằng trình soạn thảo văn bản, tìm khu vực `TỰ SỬA Ở ĐÂY` ở đầu phần script. Ở đó bạn đổi được tên nhân vật, các câu đùa, độ cao nhảy, tốc độ chạy, số mạng và cả bản vẽ màn chơi bằng ký tự. Lưu file rồi tải lại trang để thấy thay đổi.
+Mở `index.html` bằng trình soạn thảo văn bản, tìm khu vực `TỰ SỬA Ở ĐÂY` ở đầu phần script. Ở đó bạn đổi được tên nhân vật, các câu đùa, độ cao nhảy, tốc độ chạy, số mạng và cả bản vẽ màn chơi bằng ký tự. Lưu file rồi tải lại trang để thấy thay đổi.
 
 ## Ghi chú
 
