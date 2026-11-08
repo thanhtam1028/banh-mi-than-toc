@@ -6,7 +6,9 @@ Toàn bộ game nằm trong một file [`game.html`](game.html), viết bằng H
 
 ## Cách chơi
 
-Tải `game.html` về rồi nhấp đúp để mở bằng Chrome, Safari hoặc Firefox.
+**Chơi online:** https://thanhtam1028.github.io/banh-mi-than-toc/game.html
+
+Hoặc tải `game.html` về rồi nhấp đúp để mở bằng Chrome, Safari hoặc Firefox.
 
 | Phím | Việc |
 |---|---|
