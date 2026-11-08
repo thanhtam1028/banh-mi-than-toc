@@ -40,7 +40,7 @@ const CAU_DUA_KHI_THANG = [
 // Chữ bay lên khi đạp trúng chuột
 const CAU_KHI_DAP_QUAI = ["ối!", "bẹp!", "á à!", "huhu", "chít chít!"];
 
-const DO_CAO_NHAY = 13;      // Độ cao nhảy: số càng lớn nhảy càng cao (nên để 10 đến 16)
+const DO_CAO_NHAY = 14;      // Độ cao nhảy: số càng lớn nhảy càng cao (nên để 10 đến 16). Cần từ 14 trở lên để hái hoa trên cao
 const TOC_DO_CHAY = 5;       // Tốc độ chạy (nên để 3 đến 8)
 const SO_MANG = 3;           // Số mạng lúc đầu
 const THOI_GIAN_CA_PHE = 8;  // Số giây chạy nhanh sau khi uống cà phê sữa đá
@@ -49,6 +49,7 @@ const THOI_GIAN_CA_PHE = 8;  // Số giây chạy nhanh sau khi uống cà phê 
 //   #  đất            B  gạch          ?  hộp có xu
 //   K  hộp bí mật có cà phê (trông giống hộp ?)
 //   o  đồng xu        E  chuột cống    P  chỗ xuất phát
+//   f  hoa 🌼 (bị chuột cắn thì nhỏ lại, hái hoa để lớn lên)
 //   F  cờ đích        dấu cách là khoảng trống
 // Hai hàng dưới cùng là mặt đất; chừa khoảng trống để làm hố.
 const MAN_CHOI = [
@@ -58,7 +59,7 @@ const MAN_CHOI = [
   "                                                                                                    ",
   "                                             o o o                                                  ",
   "                                            BBBBBBB                                                 ",
-  "                                                                                                    ",
+  "                                 f                                         f                        ",
   "              ?K?                                           B?B                    o o              ",
   "                                      BBBB                                        BBBBB             ",
   "      o o o                                                       BB                                ",
@@ -107,6 +108,7 @@ function loadLevel() {
       if (c === "P") startPos = { x: px + 5, y: py + T - 36 };
       else if (c === "E") enemies.push({ x: px + 3, y: py + T - 28, w: 34, h: 28, vx: -60, vy: 0, onGround: false, active: false, stomped: false, squash: 0 });
       else if (c === "o") items.push({ type: "coin", x: px + T / 2, y: py + T / 2, r: 12 });
+      else if (c === "f") items.push({ type: "flower", x: px + T / 2, y: py + 2, r: 16 });   // lơ lửng cao hơn xu một chút
       else if (c === "F") flag = { x: px + T / 2, y: py + T };
       else continue;
       grid[y][x] = " ";
@@ -116,7 +118,7 @@ function loadLevel() {
   if (!flag) flag = { x: (COLS - 2) * T + T / 2, y: (ROWS - 2) * T };
 
   player = { x: startPos.x, y: startPos.y, w: 30, h: 36, vx: 0, vy: 0, onGround: false,
-             face: 1, coyote: 0, buffer: 0, sx: 1, sy: 1, coffee: 0, rot: 0 };
+             face: 1, coyote: 0, buffer: 0, sx: 1, sy: 1, coffee: 0, rot: 0, small: false, inv: 0 };
   camX = 0;
 }
 
@@ -176,6 +178,8 @@ const SFX = {
   power: ["sawtooth", 260, 1300, 0.45, 0.05],
   land:  ["sine",     140, 60,   0.07, 0.12],
   die:   ["sawtooth", 500, 50,   0.8,  0.07],
+  hurt:  ["sawtooth", 700, 120,  0.25, 0.07],
+  grow:  ["square",   300, 900,  0.3,  0.05],
   win:   ["square",   520, 1560, 0.6,  0.05],
 };
 function sfx(name) {
@@ -235,6 +239,35 @@ function die() {
   player.vx = 0; player.vy = -700; player.coffee = 0;
   shake = 12;
   sfx("die");
+}
+
+// Đổi cỡ nhân vật (giữ nguyên vị trí chân). Trả về false nếu lớn lên mà bị kẹt trần.
+function setSize(small) {
+  const p = player;
+  const w = small ? 22 : 30, h = small ? 25 : 36;
+  const old = { x: p.x, y: p.y, w: p.w, h: p.h };
+  p.x += (p.w - w) / 2;
+  p.y += p.h - h;
+  p.w = w; p.h = h;
+  if (!small && overlapsSolid(p)) {
+    p.x = old.x; p.y = old.y; p.w = old.w; p.h = old.h;
+    return false;
+  }
+  p.small = small;
+  return true;
+}
+
+// Bị chuột cắn: đang lớn thì nhỏ lại, đang nhỏ thì mới chết
+function hurt() {
+  if (state !== "play" || player.inv > 0) return;
+  if (player.small) { die(); return; }
+  setSize(true);
+  player.inv = 1.5;
+  player.vy = -420;               // nảy lên một cái, không bị đẩy lùi (tránh rơi xuống hố)
+  player.onGround = false;
+  floatText("Ái! Nhỏ lại rồi", player.x + player.w / 2, player.y - 10, "#ff8a65", 22);
+  shake = 8;
+  sfx("hurt");
 }
 
 function win() {
@@ -311,6 +344,7 @@ function updatePlayer(dt) {
   }
 
   p.coffee = Math.max(0, p.coffee - dt);
+  p.inv = Math.max(0, p.inv - dt);
   p.sx += (1 - p.sx) * Math.min(1, dt * 10);
   p.sy += (1 - p.sy) * Math.min(1, dt * 10);
 
@@ -326,6 +360,16 @@ function updateItems() {
       coins++; score += 10;
       floatText("+1", it.x, it.y - 10, "#ffd740");
       sfx("coin");
+    } else if (it.type === "flower") {
+      if (p.small) {
+        if (!setSize(false)) return true;   // bị kẹt trần thì chưa hái được
+        floatText("LỚN LÊN! 🌼", it.x, it.y - 20, "#ffee58", 28);
+        sfx("grow");
+      } else {
+        score += 100;
+        floatText("+100", it.x, it.y - 10, "#ffee58");
+        sfx("coin");
+      }
     } else {
       p.coffee = THOI_GIAN_CA_PHE; score += 200;
       floatText("CAFFEINE!!! ⚡", it.x, it.y - 20, "#ff7043", 30);
@@ -364,7 +408,7 @@ function updateEnemies(dt) {
         shake = Math.max(shake, 5);
         sfx("stomp");
       } else {
-        die();
+        hurt();
       }
     }
   }
@@ -477,7 +521,10 @@ function drawFlag() {
 function drawItem(it) {
   const bob = Math.sin(clock * 3 + it.x) * 3;
   if (it.type === "coin") drawCoin(it.x, it.y + bob, it.r);
-  else {
+  else if (it.type === "flower") {
+    ctx.font = `32px ${EMOJI}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("🌼", it.x, it.y + bob);
+  } else {
     ctx.font = `30px ${EMOJI}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText("🧋", it.x, it.y + bob);
   }
@@ -514,17 +561,20 @@ function drawPlayer() {
   ctx.translate(p.x + p.w / 2 + jx, p.y + p.h + jy);
   if (state === "dying") { ctx.translate(0, -p.h / 2); ctx.rotate(p.rot); ctx.translate(0, p.h / 2); }
   ctx.scale(p.sx, p.sy);
+  const k = p.small ? 0.7 : 1;        // nhỏ lại thì vẽ bé đi
+  ctx.scale(k, k);
+  if (p.inv > 0 && Math.floor(clock * 14) % 2 === 0) ctx.globalAlpha = 0.35;   // nhấp nháy khi vừa bị cắn
 
   ctx.save();
   ctx.scale(p.face, 1);
   ctx.font = `46px ${EMOJI}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillText("🥖", 0, -p.h / 2);
+  ctx.fillText("🥖", 0, -18);
   ctx.restore();
 
   // Mắt lồi nhìn theo hướng chạy
   const lx = clamp(p.vx / 100, -2.5, 2.5), ly = clamp(p.vy / 300, -2.5, 2.5);
   for (const ex of [-7, 7]) {
-    const x = ex + p.face * 2, y = -p.h / 2 - 4;
+    const x = ex + p.face * 2, y = -22;
     ctx.fillStyle = "#fff"; ctx.strokeStyle = "#333"; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     ctx.fillStyle = "#111";

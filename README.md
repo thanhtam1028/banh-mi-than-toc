@@ -18,7 +18,9 @@ Hoặc tải `index.html` về rồi nhấp đúp để mở bằng Chrome, Safa
 
 - Đạp lên đầu chuột cống để hạ nó.
 - Cụng đầu vào hộp `?` để lấy xu. Có một hộp bí mật chứa ly cà phê sữa đá, uống vào sẽ chạy nhanh gấp đôi.
-- Chạm cờ ở cuối màn để thắng. Rơi xuống hố hoặc chạm ngang chuột thì mất một mạng.
+- Bị chuột cắn lần đầu thì bánh mì **nhỏ lại** (chưa mất mạng). Cắn lần hai mới mất mạng.
+- Hái bông hoa 🌼 lơ lửng trên cao để **lớn lên** lại. Phải giữ phím nhảy để nhảy cao mới với tới.
+- Chạm cờ ở cuối màn để thắng. Rơi xuống hố thì mất một mạng ngay.
 
 ## Tự sửa game
 
